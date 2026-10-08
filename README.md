@@ -1,5 +1,5 @@
 # 拷贝漫画 · HarmonyOS 客户端
-
+**有什么好的想法或者bug直接提issue或者填收集表 https://docs.qq.com/form/page/DYkdXcUxYamZyV0dT 或者进群反馈都可以的**
 用 ArkTS / ArkUI 写的原生鸿蒙漫画阅读客户端，适配 HarmonyOS 手机与平板（API 26）。
 
 界面完全原生：不是 WebView 套壳，翻页、滚动、材质、深浅色都走系统能力。顶部标题栏使用 HarmonyOS Design 的系统材质（`systemMaterialEffect`），内容滚到栏下时会浮现系统级的光感模糊，并且内容从一开始就顶到状态栏，全程沉浸式。
