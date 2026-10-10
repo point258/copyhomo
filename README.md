@@ -1,3 +1,6 @@
+<div align="center">
+  <img src="{95D580FE-1AAF-45C7-AFBD-6892C2F7C7A5}.png" width="250" >
+  <br>
 # 拷贝漫画 · HarmonyOS 客户端
 **有什么好的想法或者bug直接提issue或者填收集表 https://docs.qq.com/form/page/DYkdXcUxYamZyV0dT 或者进群反馈都可以的**
 用 ArkTS / ArkUI 写的原生鸿蒙漫画阅读客户端，适配 HarmonyOS 手机与平板（API 26）。
