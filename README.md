@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/group-1126494767.gif" width="450" alt="交流群 1126494767">
+  <img src="{95D580FE-1AAF-45C7-AFBD-6892C2F7C7A5}.png" width="450">
   <br>
   
 # 拷贝漫画 · HarmonyOS 客户端
