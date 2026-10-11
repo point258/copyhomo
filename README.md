@@ -28,13 +28,35 @@
 
 **阅读**
 - 详情页：封面、作者、题材标签、简介、章节列表（含单行本 / 特典分组）、订阅、继续阅读
-- 阅读器：竖排连续滚动与横向翻页两种模式、图片间距三档、章节内目录、上一话 / 下一话、本章评论
+- 阅读器：三种翻页方式（竖排滚动 / 左滑翻页 / 右滑翻页）、图片间距三档、章节内目录、上一话 / 下一话、本章评论
+- 支持双指缩放与双击放大，放大后可拖动查看细节
 - 阅读进度按话记忆，回来接着看
+
+**下载与离线**
+- 支持下载本话 / 下载全部章节 / 下载范围章节；批量任务自动控速，被服务端限流时自动放慢、等待后重试
+- 已下载的章节保存在本机，阅读时优先读本地，断网也能看
+- 书架 →「下载」页签按漫画管理已下载内容；条目左滑即可删除（原版与超分版分别可删，真删本地文件）
+
+**超分**
+- 对已下载的漫画一键超分：倍率 1.5x / 2x / 2.5x / 3x / 3.5x / 4x 可选，范围可选整本 / 某章 / 范围章节
+- 超分结果以「（作品名）-超分」独立成栏，原版不受影响，两者互不干预
+- 全部在本机完成，不上传任何图片
+
+<div align="center">
+  <img src="docs/p1.jpg" width="500">
+  <br>
+  
+</div>
 
 **书架与账号**
 - 书架：本地订阅与阅读历史，可清空历史
 - 登录后可看云端订阅与云端历史，跨设备同步
 - 账号密码只用于换取令牌，不落盘
+
+**内容过滤**
+- 内置分级核验：限制级作品在首页、排行、分类、搜索、详情等入口自动屏蔽
+- 屏蔽强度可选：标准（屏蔽「裸露級 / 情色級」）/ 严格（连「擦邊級」一起屏蔽）
+- 已屏蔽记录可在设置里一键清除
 
 **外观**
 - 主题：跟随系统 / 浅色 / 深色，切换即时生效
@@ -58,6 +80,7 @@
 | 项目 | 说明 |
 | --- | --- |
 | 语言 | ArkTS，Stage 模型 |
+| 原生 | C++（NAPI）：超分引擎基于 EGL + OpenGL ES 3 离屏渲染，接入系统 GPU / AI 超分能力 |
 | UI | ArkUI 声明式（`NavDestination` / `Grid` / `List` / `LazyForEach`） |
 | 设计系统 | HarmonyOS Design Kit（`@kit.UIDesignKit`）的 `HdsNavigation` / `HdsNavDestination` |
 | 窗口 | 沉浸式窗口、安全区扩展、系统材质与主题跟随 |
@@ -72,16 +95,18 @@ copymanga-harmony/
 ├── AppScope/                      应用级配置与图标
 ├── entry/
 │   ├── src/main/
+│   │   ├── cpp/                   超分引擎（C++ / NAPI：EGL + OpenGL ES 3）
 │   │   ├── ets/
 │   │   │   ├── api/               接口定义、请求头、主机池
-│   │   │   ├── common/            HTTP、日志、偏好存储、尺寸常量、窗口与材质
-│   │   │   ├── components/        列表卡片、状态页、筛选胶囊、评论列表
+│   │   │   ├── common/            HTTP、日志、偏好存储、尺寸常量、窗口与材质、超分引擎封装
+│   │   │   ├── components/        列表卡片、状态页、筛选胶囊、评论列表、超分对话框
 │   │   │   ├── entryability/      入口 Ability
+│   │   │   ├── logic/             内容过滤与分级核验
 │   │   │   ├── model/             数据模型与首页分区解析
 │   │   │   ├── navigation/        路由表
 │   │   │   ├── pages/             底部页签容器
-│   │   │   ├── screens/           首页 / 排行 / 搜索 / 书架 / 我的 / 详情 / 阅读 / 登录 / 设置
-│   │   │   └── state/             全局状态、数据源、本地书架
+│   │   │   ├── screens/           首页 / 排行 / 搜索 / 书架 / 我的 / 详情 / 阅读 / 登录 / 设置 / 下载章节
+│   │   │   └── state/             全局状态、数据源、本地书架、下载与超分
 │   │   ├── resources/             字符串、颜色（浅色 / 深色两套）、图标
 │   │   └── module.json5           模块与权限声明
 │   └── build-profile.json5
@@ -105,7 +130,7 @@ copymanga-harmony/
 hvigorw --mode module -p product=default -p module=entry@default assembleHap --no-daemon
 ```
 
-产物在 `entry/build/default/outputs/default/` 下。
+产物在 `entry/build/default/outputs/default/` 下。另有面向 API 23+ 旧设备的 `compat23` 产品：构建时加 `-p product=compat23`（产物在 `outputs/compat23/` 下）。
 
 关于签名：工程里 `signingConfigs` 默认为空，因此命令行产出的是未签名包（`entry-default-unsigned.hap`），可先装到模拟器上验证；要装真机，请在 DevEco Studio 的 **File → Project Structure → Signing Configs** 里勾选自动生成签名，DevEco 会把配置写回 `build-profile.json5`。
 
@@ -118,7 +143,8 @@ hdc install -r entry/build/default/outputs/default/entry-default-signed.hap
 ## 已知限制
 
 - 只有手机 / 平板两种设备形态，未适配 PC 与折叠屏的分栏布局
-- 不提供离线下载与本地漫画缓存，阅读依赖网络
+- 离线阅读仅限已下载的章节，未下载的页面仍需联网
+- 超分在设备本地计算，批量任务的耗时与功耗取决于设备性能
 - 云端订阅 / 云端历史需要登录站点账号
 - 阅读页顶栏是"点一下才浮现"的浮层，不是常驻标题栏
 - 接口主机由客户端自行探测，首次进入某些页面需要短暂等待
@@ -126,3 +152,4 @@ hdc install -r entry/build/default/outputs/default/entry-default-signed.hap
 ## 免责声明
 
 本项目为第三方非官方客户端，与站点运营方没有任何关系，仅供学习交流与个人使用，请勿用于商业用途。应用内展示的所有漫画内容、图片与商标均归原始权利人及站点所有。
+
