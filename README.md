@@ -1,3 +1,4 @@
+**目前超分有比较严重的问题，源码先下了，正在提交工单请求官方对npu这一块进行援助，修好再上**
 <div align="center">
   <img src="docs/icon1.png" width="200">
   <br>
